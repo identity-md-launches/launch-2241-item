@@ -1,3 +1,9 @@
 out/
 cache/
 broadcast/
+
+# Revision delivery path budget: exactly these two files.
+!/.imd-responses.json
+!/artifacts/
+/artifacts/*
+!/artifacts/answer.txt
