@@ -1,0 +1,55 @@
+{
+  "token": {
+    "chainId": 4663,
+    "address": "0x4f1b7a5aaf3768f7500e9ab5cbbf3762834e8b57",
+    "name": "Item",
+    "symbol": "ITEM"
+  },
+  "primary": "item-256.png",
+  "files": [
+    {
+      "file": "item-256.png",
+      "role": "token image",
+      "type": "image/png",
+      "width": 256,
+      "height": 256,
+      "bytes": 8740,
+      "cid": "bafkreifenq2t55lzpff6ffoxct6klzoy6ur3rbscdpjdrkp3e42kumxpby",
+      "sha256": "a46c353ef579794be295d714fca5e5d8f523b886421bd238a9fb2734aa32ef0e",
+      "url": "https://gateway.pinata.cloud/ipfs/bafkreifenq2t55lzpff6ffoxct6klzoy6ur3rbscdpjdrkp3e42kumxpby"
+    },
+    {
+      "file": "item.svg",
+      "role": "SVG master",
+      "type": "image/svg+xml",
+      "width": 1024,
+      "height": 1024,
+      "bytes": 987,
+      "cid": "bafkreicqjagwzaq63lpsnlb2gq4nl7wtplqz5772jomqgvpsbva3ohws2e",
+      "sha256": "50480d6c821edadf26ac3a3438d5fed37ae19efffa4b990355f20d41b71ed2d1",
+      "url": "https://gateway.pinata.cloud/ipfs/bafkreicqjagwzaq63lpsnlb2gq4nl7wtplqz5772jomqgvpsbva3ohws2e"
+    },
+    {
+      "file": "item-32.svg",
+      "role": "32 px SVG",
+      "type": "image/svg+xml",
+      "width": 32,
+      "height": 32,
+      "bytes": 983,
+      "cid": "bafkreihtkwltlruqamom7sgy43jxdchkydqflruzzghbkbe37g3c33vbt4",
+      "sha256": "f3559735c690031ccfc8d8e6d37188eac0e055c699c98e15049bf9b62deea19f",
+      "url": "https://gateway.pinata.cloud/ipfs/bafkreihtkwltlruqamom7sgy43jxdchkydqflruzzghbkbe37g3c33vbt4"
+    },
+    {
+      "file": "item-64.svg",
+      "role": "64 px SVG",
+      "type": "image/svg+xml",
+      "width": 64,
+      "height": 64,
+      "bytes": 983,
+      "cid": "bafkreiejgix7cndhixbbbs5r6olnnjr3qvjpyhgvddafxbda7mpcpni6e4",
+      "sha256": "89322ff1346745c210cbb1f396d6a63b8552fc1cd518c05b8460fb1e27b51e27",
+      "url": "https://gateway.pinata.cloud/ipfs/bafkreiejgix7cndhixbbbs5r6olnnjr3qvjpyhgvddafxbda7mpcpni6e4"
+    }
+  ]
+}

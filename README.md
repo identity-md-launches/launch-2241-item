@@ -1,8 +1,10 @@
 # Basket Protocol: ITEM reward token and contracts
 
 Reward token and four application contracts for Basket Protocol (vault token BASK) on Robinhood Chain
-(chain id 4663). No website. Foundry project at the repository root: `forge build`, `forge test`,
-`forge fmt --check`.
+(chain id 4663). Foundry project at the repository root: `forge build`, `forge test`,
+`forge fmt --check`. There is no dapp: the only page is a static token logo page (`web/` → `dist/`, see
+[Token logo page](#token-logo-page)) that shows and serves ITEM's logo files. It has no wallet connection
+and makes no chain calls.
 
 ## Contracts
 
@@ -81,6 +83,140 @@ down. Before any stake change the global index is updated, then the caller. A us
 exits. Release is always the difference of the cumulative formulas, never a per-second rate. Total payouts
 never exceed what the contract received; the dust lost to rounding is at most a few wei per claim and stays
 in the contract.
+
+## Token logo
+
+ITEM's own logo, for chain 4663 at `0x4f1b7a5aaf3768f7500e9ab5cbbf3762834e8b57`, lives in
+`assets/logo/`. The 256 x 256 PNG is the token image. Every file is byte-for-byte what the IPFS gateway
+served for its CID, with no redrawing or re-encoding. `assets/logo/logo.json` lists the same CIDs, sizes
+and SHA-256 hashes.
+
+| File           | Use                 | CID                                                           |
+| -------------- | ------------------- | ------------------------------------------------------------- |
+| `item-256.png` | Token image, 256 px | `bafkreifenq2t55lzpff6ffoxct6klzoy6ur3rbscdpjdrkp3e42kumxpby` |
+| `item.svg`     | SVG master          | `bafkreicqjagwzaq63lpsnlb2gq4nl7wtplqz5772jomqgvpsbva3ohws2e` |
+| `item-32.svg`  | 32 px SVG           | `bafkreihtkwltlruqamom7sgy43jxdchkydqflruzzghbkbe37g3c33vbt4` |
+| `item-64.svg`  | 64 px SVG           | `bafkreiejgix7cndhixbbbs5r6olnnjr3qvjpyhgvddafxbda7mpcpni6e4` |
+
+To check the bytes, recompute each CID (CIDv1, raw codec, sha2-256) from its file and compare it with the
+table, or compare `sha256sum assets/logo/*` with `logo.json`. If you submit the token's logo to a block
+explorer (RobinScan, Blockscout), use these same files.
+
+## Token logo page
+
+A one-page static site that shows ITEM's logo and serves the four files above for download. It shows each
+file's CID and SHA-256, can hash the served files in the browser, and lists the token facts (name, symbol,
+decimals, chain, contract). It changes nothing about the token, pool or contracts. It has no wallet and no
+RPC calls. Vite 6 and TypeScript 5, no UI framework. Design system: [DESIGN.md](DESIGN.md).
+
+| Path | What it is |
+| --- | --- |
+| `web/index.html` | Document head (title, description, favicon, og:title, og:image) and header |
+| `web/src/main.ts` | Page markup, the Copy address button and the SHA-256 check |
+| `web/src/logo.ts` | Reads `assets/logo/logo.json`; hashing helper |
+| `web/src/config.ts` | Chain name, ID and explorer from the pinned network file; token decimals |
+| `web/src/style.css` | Design tokens and all component styles |
+| `web/package.json`, `web/package-lock.json` | Manifest and lockfile (registry.npmjs.org only) |
+| `dist/` | Committed production export served as is: `index.html`, `assets/` (hashed JS and CSS), `logo/` |
+
+`dist/logo/` is Vite's public dir `assets/` copied unchanged, so the files the page serves are the files in
+`assets/logo/`, byte for byte. Every URL in the export is relative (`base: "./"`), so the site works from a
+gateway subpath or an ENS name. `web/.gitignore` excludes only `web/node_modules/`.
+
+### Install, preview, rebuild
+
+Node 18 or newer (checked with Node 24.21.0).
+
+```sh
+cd web
+npm ci                 # install the exact versions in package-lock.json
+npm run dev            # live development server
+npm run build          # tsc --noEmit, then vite build into ../dist (replaces it)
+npm run preview        # serve the built ../dist locally
+npm run typecheck      # tsc --noEmit only
+```
+
+After changing anything in `web/` or `assets/logo/`, run `npm run build` and commit `dist/` with the source.
+The host serves the committed `dist/` and does not rebuild.
+
+### Validation (2026-10-19, final source)
+
+| Check | Command | Result |
+| --- | --- | --- |
+| Typecheck | `npm run typecheck` (TypeScript 5.9.3) | passed, no errors |
+| Production build | `npm run build` (Vite 6.4.4) | passed: `dist/index.html` 2.28 kB, CSS 6.83 kB, JS 8.72 kB |
+| Logo bytes in the export | `cmp`, `sha256sum dist/logo/* assets/logo/*` | identical to `logo.json` hashes |
+| Design probe taste@1 | `node .imd/reads/skills/design-critic/scripts/taste.mjs --out test/scratch/taste` (Playwright from outside the repository via `IMD_PLAYWRIGHT`) | **16/16 passed** at 320, 390 and 1440: render, layout, targets, contrast, casing, tracking, eyebrows, type-sizes (4 sizes), type-faces (2 families, weights 400/600), glyphs, slogans, repetition, copy-budget (15 prose words on the 390 first screen), chrome, motion, share |
+| Interaction tests | a Playwright script in the scratch area (not committed). It serves `dist/` under `/preview/` and drives Google Chrome 154 (Playwright, `channel: "chrome"`) at 320, 390 and 1440 | **33 assertions passed, 0 failed**, four runs in a row on the final export |
+
+The interaction tests covered:
+
+- No console errors, failed requests or horizontal scroll at any width.
+- The logo and the "Download 256 px PNG" button are on the first screen at 320×844, 390×844 and
+  1440×844.
+- The hero image and all thumbnails load.
+- All four downloads save the right file name with bytes identical to `assets/logo/`.
+- "Copy address" puts `0x4f1b7a5aaf3768f7500e9ab5cbbf3762834e8b57` on the clipboard and shows "Address
+  copied."
+- "Check SHA-256 hashes" reports "All 4 files match their SHA-256." and each row shows a match.
+- With one file swapped for other bytes, it reports "3 of 4 files match" and marks the row. With a file
+  request aborted, the row reports "Unable to load the file".
+- The button is re-enabled after each check.
+- The first Tab stop is the skip link, which focuses `<main>`. The next six stops each show a 2px solid
+  focus outline.
+- The title, description, og:title, og:image and favicon are present.
+
+I looked at the screenshots at 320, 390 (including a focused state) and 1440. At 390 the first screen
+shows the title, the one-line description, the logo, both download buttons and the token address.
+
+Limitations, not checked:
+
+- WebKit/Safari was not run (the WebKit browser is not installed on this machine). Only Google Chrome was
+  used.
+- No screen-reader session, no native 200% browser zoom (the narrow viewport at 320 stands in for reflow),
+  no physical device.
+- The clipboard fallback path for an insecure context and the "only on an HTTPS page" message were not
+  exercised in a browser.
+- `og:image` is a relative path, as static hosting requires. Some unfurlers need an absolute URL, which
+  is only known once the site is hosted.
+- Whether RobinScan or Blockscout accept the files is outside this repository. No logo was submitted to
+  either explorer by this job.
+
+### Better Interface review
+
+The page was built and reviewed with the pinned Better Interface guide (all six domains).
+`artifacts/validation.md` holds the same record with more detail.
+
+| Domain | Coverage | Notes |
+| --- | --- | --- |
+| Accessibility | Checked | Native `<a download>` and `<button>`, one `h1` and nested `h2`/`h3`, a `<main>` landmark, a skip link, `:focus-visible` 2px outline, polite `role="status"` regions for copy and the hash check, informative alt on the hero logo and `alt=""` on decorative thumbnails, `prefers-reduced-motion` guard. The keyboard walk ran in Chrome. Not run: a screen reader or an automated axe audit. |
+| Layout | Checked | One column under 40rem, three-column file rows from 40rem, two-column hero from 52rem. Logical properties throughout. Long hashes wrap (`overflow-wrap: anywhere`). No horizontal scroll at 320/390/1440. Not run: an RTL mirror (no RTL locale is shipped). |
+| Writing | Checked | Verb-first labels that name the file. Sentence case. Errors say how to recover ("Reload and try again", "press Ctrl+C or Cmd+C"). No em dashes or emoji. |
+| Typography | Checked | 4 sizes, 2 weights, a system sans plus monospace for data only. Headings balanced, intros `pretty`, measure capped at 34 to 40rem. |
+| Colors | Checked | Role tokens over hex primitives. One filled action per view. Status is never colour alone. Contrast computed from declared pairs (lowest text pair 6.75:1) and measured by the probe. |
+| UI | Checked | Flat surfaces with no shadows. Radius 0.5rem for controls and 1rem for the tile. Scale 0.96 on press, only `scale` and `background-color` transition, 150ms. Not applicable: overlays, theme switch, icon animations (none exist). |
+
+Findings, all fixed before the final build:
+
+1. Medium, `web/src/style.css:253`. The hero image carried a 1px outline inside the white tile. Because
+   the PNG has a transparent background, this drew a second frame (seen on the 390 screenshot). The
+   outline and its token were removed, and the 390 screenshot was rechecked.
+2. Low, `web/src/main.ts:19`. File metadata read "token image. PNG, 256 × 256…": lowercase start and a
+   repeated type. It now reads "Token image · 256 × 256 PNG · 8,740 bytes", and the probe was rerun.
+3. Low, `web/src/main.ts:31`. Thumbnails used `loading="lazy"`, which left `item-64.svg` blank in a
+   full-page capture. These files are under 1 KB each, so the attribute was removed. The test checks that
+   every thumbnail loads.
+4. Low, `web/index.html:35`. The header RobinScan link had `href="#"` until script ran. It is now a
+   static link to the token on RobinScan.
+5. Low, `web/src/style.css:108`. The probe reported a control under the comfortable 44px. Measured at
+   390: "Copy address" (a `.button--small` variant) and the skip link were each 40px tall. The small
+   variant was deleted, and the skip link got `min-height: 2.75rem`. The probe now reports 0 controls
+   under 44px.
+
+Remaining notes:
+
+- The focus outline on the filled primary button sits 2px outside it, on the page background (6.75:1).
+  Against the button's own ink fill the blue would be 2.42:1, but the 2px offset keeps the two apart.
 
 ## Views
 
