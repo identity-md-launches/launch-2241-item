@@ -1,0 +1,34 @@
+{
+  "kind": "evm_project",
+  "token": {
+    "contract": "LaunchToken",
+    "name": "Item",
+    "symbol": "ITEM",
+    "decimals": 18
+  },
+  "contracts": [
+    {
+      "contract": "ItemStaking",
+      "constructorArgs": ["$token"]
+    },
+    {
+      "contract": "BaskUsdgGauge",
+      "constructorArgs": ["$token"]
+    },
+    {
+      "contract": "ItemEthGauge",
+      "constructorArgs": ["$token"]
+    },
+    {
+      "contract": "DevVesting",
+      "constructorArgs": ["$token", "0xc5e21e7a89f1fbdc5554e31702e627dd6262c856"]
+    }
+  ],
+  "pool": {
+    "pairedCurrency": "0x0000000000000000000000000000000000000000",
+    "fee": 12500,
+    "tickSpacing": 60,
+    "initialPrice": "79228162514264337593543950336"
+  },
+  "notes": "Basket Protocol on Robinhood Chain (4663). LaunchToken is Item (ITEM), distinct from the existing BASK vault token. ItemStaking accepts ITEM and streams received BASK, USDG and WETH rewards over seven days of time with a positive total stake; it can receive BASK vault fees if designated as the vault's fee recipient. BaskUsdgGauge and ItemEthGauge accept the canonical BASK/USDG and ITEM/WETH v2 LP tokens and distribute ITEM over four years of time with a positive total stake using a declining release curve. After deployment, anyone may approve ITEM and call each gauge's start() once, providing its required funding of 490,000,000 ITEM or 210,000,000 ITEM respectively; each canonical pair must already exist. DevVesting requires a separate approval and one-time fund() of 40,000,000 ITEM. Anyone may call release() after funding to pay the fixed beneficiary 0xc5e21e7a89f1fbdc5554e31702e627dd6262c856. Vesting is zero before day 365 after deployment, then follows elapsed time divided by 1,460 days, reaching full vesting on day 1,460. Deployment makes no initialization calls and sends no tokens to the application contracts. The application contracts have no owner, admin, upgrade, pause or rescue powers. Staking has no lock; gauge withdrawals return only LP and ITEM rewards require a separate claim. The first LP staker earns alone while it is the sole staker. If an issuer burn leaves ItemStaking short, claims are first come, first served and unpaid rewards remain owed."
+}
