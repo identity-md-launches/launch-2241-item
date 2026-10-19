@@ -5,7 +5,6 @@ import { fileUrl, formatType, hashFile, manifest, type LogoFile } from "./logo";
 const { token, files } = manifest;
 const primary = files.find((f) => f.file === manifest.primary) ?? files[0];
 const master = files.find((f) => f.role === "SVG master");
-const tokenUrl = `${CHAIN.explorer}/token/${token.address}`;
 const bytesFormat = new Intl.NumberFormat("en");
 
 function escapeHtml(value: string | number): string {
@@ -94,9 +93,7 @@ function render(): string {
       <div><dt>Symbol</dt><dd>${escapeHtml(token.symbol)}</dd></div>
       <div><dt>Decimals</dt><dd>${TOKEN_DECIMALS}</dd></div>
       <div><dt>Chain</dt><dd>${CHAIN.name}, chain ID ${token.chainId}</dd></div>
-      <div><dt>Contract</dt><dd><code>${escapeHtml(token.address)}</code></dd></div>
     </dl>
-    <p><a class="text-link" href="${tokenUrl}" target="_blank" rel="noopener noreferrer">View ${escapeHtml(token.symbol)} on RobinScan</a></p>
   </section>
 
   <footer class="container site-footer">

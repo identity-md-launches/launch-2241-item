@@ -106,7 +106,7 @@ explorer (RobinScan, Blockscout), use these same files.
 
 A one-page static site that shows ITEM's logo and serves the four files above for download. It shows each
 file's CID and SHA-256, can hash the served files in the browser, and lists the token facts (name, symbol,
-decimals, chain, contract). It changes nothing about the token, pool or contracts. It has no wallet and no
+decimals, chain). It changes nothing about the token, pool or contracts. It has no wallet and no
 RPC calls. Vite 6 and TypeScript 5, no UI framework. Design system: [DESIGN.md](DESIGN.md).
 
 | Path | What it is |
@@ -144,10 +144,17 @@ The host serves the committed `dist/` and does not rebuild.
 | Check | Command | Result |
 | --- | --- | --- |
 | Typecheck | `npm run typecheck` (TypeScript 5.9.3) | passed, no errors |
-| Production build | `npm run build` (Vite 6.4.4) | passed: `dist/index.html` 2.28 kB, CSS 6.83 kB, JS 8.72 kB |
+| Production build | `npm run build` (Vite 6.4.4) | passed: `dist/index.html` 2.28 kB, CSS 6.82 kB, JS 8.43 kB |
 | Logo bytes in the export | `cmp`, `sha256sum dist/logo/* assets/logo/*` | identical to `logo.json` hashes |
 | Design probe taste@1 | `node .imd/reads/skills/design-critic/scripts/taste.mjs --out test/scratch/taste` (Playwright from outside the repository via `IMD_PLAYWRIGHT`) | **16/16 passed** at 320, 390 and 1440: render, layout, targets, contrast, casing, tracking, eyebrows, type-sizes (4 sizes), type-faces (2 families, weights 400/600), glyphs, slogans, repetition, copy-budget (15 prose words on the 390 first screen), chrome, motion, share |
 | Interaction tests | a Playwright script in the scratch area (not committed). It serves `dist/` under `/preview/` and drives Google Chrome 154 (Playwright, `channel: "chrome"`) at 320, 390 and 1440 | **33 assertions passed, 0 failed**, four runs in a row on the final export |
+
+Revision rerun (2026-10-19, after removing the repeated Contract row and second RobinScan link): typecheck
+and build passed again; the taste probe passed 16/16 again; a reduced Playwright script (bundled Chromium)
+passed 24 of 24 assertions at 320, 390 and 1440. It checked no console or request errors, no horizontal
+scroll, the PNG download on the first screen with bytes matching `assets/logo/`, the token address shown
+exactly once, exactly one RobinScan link, Copy address, and "All 4 files match their SHA-256." The
+fault-injection, keyboard and four-download cases below were not rerun on this revision.
 
 The interaction tests covered:
 
@@ -185,7 +192,6 @@ Limitations, not checked:
 ### Better Interface review
 
 The page was built and reviewed with the pinned Better Interface guide (all six domains).
-`artifacts/validation.md` holds the same record with more detail.
 
 | Domain | Coverage | Notes |
 | --- | --- | --- |
@@ -212,6 +218,10 @@ Findings, all fixed before the final build:
    390: "Copy address" (a `.button--small` variant) and the skip link were each 40px tall. The small
    variant was deleted, and the skip link got `min-height: 2.75rem`. The probe now reports 0 controls
    under 44px.
+
+6. Low, `web/src/main.ts:95`. Review follow-up: the Token facts repeated the contract address (already
+   in the hero beside Copy address) and a second RobinScan link (already in the header). Both were
+   removed; the Token list ends at Chain.
 
 Remaining notes:
 

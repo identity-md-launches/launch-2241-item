@@ -146,7 +146,7 @@ All classes are in `web/src/style.css`; markup is in `web/src/main.ts` unless no
   - unsupported (no `crypto.subtle` outside HTTPS): a sentence saying to use HTTPS or `sha256sum`
 - **Command block** (`pre.command`): a monospace shell command on a white surface. It scrolls
   horizontally only inside itself.
-- **Facts list** (`dl.facts`): label/value pairs for the token (name, symbol, decimals, chain, contract).
+- **Facts list** (`dl.facts`): label/value pairs for the token (name, symbol, decimals, chain). The contract address is shown once, in the hero beside Copy address, and the RobinScan link once, in the header.
 
 ## Do's and Don'ts
 

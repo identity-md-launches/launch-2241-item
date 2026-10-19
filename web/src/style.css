@@ -379,8 +379,7 @@ h2 {
   color: var(--color-text-secondary);
 }
 
-.ids dd code,
-.facts dd code {
+.ids dd code {
   font-size: var(--text-caption);
   overflow-wrap: anywhere;
 }
